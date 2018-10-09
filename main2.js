@@ -1,18 +1,71 @@
 "use strict"
 
-let abs = Math.abs;
 
-// define variable for ball count paragraph
-let para = document.querySelector('p');
-let count = 0;
+let messages = [
+	"...",
+	"Hey! That's my apple!",
+	"Stop that!",
+	"What's wrong with you?!",
+	"Stop eating my apples!",
+	"You're really getting on my nerves!",
+	"Didn't your mom tell you not to steal?!",
+	"You can't still be hungry!",
+	"What did I do to deserve this?!",
+	"How am I supposed to feed my family if you keep eating my apples?!",
+	"Would you stop if I ask nicely?",
+	"Pretty please.",
+	"You're just a really bad person you know that.",
+	"How about I go and eat your livelyhood?",
+	"You know what just keep eating em' I'll count for you.",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"10",
+	"Shit I lost count. Let's start again.",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"Ahh shit fuck this.",
+	"So how's your day been?",
+	"That's good I guess.",
+	"Mine's not been too good.",
+	"Wanna do something this weekend?... That is if you're not busy...",
+	"Ok great. I know this great diner we can go to. They have the best apple pie.",
+	"You know what... I think I love you.",
+	"Let's get married.",
+	"I think this relationship isn't gonna work. You never say anything.",
+	"Are you even listening?! Stop eating apples if you are!",
+	"You know what I don't even love you anymore!",
+	"I'm gonna give you the silent treatment",
+	"...",
+	"...",
+	"...",
+	"...",
+	"Stop eating those apples you asshole!",
+	"You know what... I'm just gonna use this memory eraser and erase all of this. I hope when I'm done you'll be gone!",
+	"*Erases cookies*"
+];
+
+let mi = 0; // Message Index
+
+let message = document.querySelector('h1');
+
+let abs = Math.abs;
 
 let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext('2d');
 
 let width = canvas.width = window.innerWidth;
 let height = canvas.height = window.innerHeight;
-
-let trans = 0.25;
 
 function random(min,max) {
 	return Math.floor(Math.random()*(max-min)) + min;
@@ -198,7 +251,7 @@ class Player extends Rigidbody {
 	constructor(position, size, velocity, tag="", color="white") {
 		super(position, size, velocity, tag, color);
 		this.acc = 1;
-		this.maxspeed = 15;
+		this.maxspeed = 10;
 		this.bSpeed = 10;
 	}
 	
@@ -236,31 +289,33 @@ class Player extends Rigidbody {
 	}
 	
 	onCollision(other) {
-	if(other.tag === "top wall") {
-		this.addForce(new Vector2(0,this.bSpeed));
+		if(other.tag === "top wall") {
+			this.addForce(new Vector2(0,this.bSpeed));
+		}
+		if(other.tag === "right wall") {
+			this.addForce(new Vector2(-this.bSpeed,0));
+		}
+		if(other.tag === "bottom wall") {
+			this.addForce(new Vector2(0,-this.bSpeed));
+		}
+		if(other.tag === "left wall") {
+			this.addForce(new Vector2(this.bSpeed,0));
+		}
 	}
-	if(other.tag === "right wall") {
-		this.addForce(new Vector2(-this.bSpeed,0));
-	}
-	if(other.tag === "bottom wall") {
-		this.addForce(new Vector2(0,-this.bSpeed));
-	}
-	if(other.tag === "left wall") {
-		this.addForce(new Vector2(this.bSpeed,0));
-	}
-}
 }
 
 class Collectable extends Rigidbody {
 	constructor(position) {
-		super(position, [20,20], [0,0], "food");
+		super(position, [20,20], [0,0], "apple", "red");
 		this.points = 1.01;
 	}
 	
 	onCollision(other) {
 		if(other.tag === "player") {
-			trans /= this.points;
-			console.log(trans);
+			mi++;
+			if(mi >= messages.length)
+				mi = 0;
+			message.textContent = messages[mi];
 			this.exists = false;
 		}
 	}
@@ -277,7 +332,7 @@ objects.findTag = function listFindTag(tag) {
 	return null;
 }
 
-objects.push(new Player([width/2, height/2], [50, 50], [0,0], "player", "red"));
+objects.push(new Player([width/2, height/2], [50, 50], [0,0], "player", "white"));
 let p = 0;
 
 objects.push(new Rigidbody([0,0], [width,10],[0,0], "top wall", "blue"));
@@ -318,7 +373,7 @@ function loop() {
 	
 	frameCount++;
 	
-	ctx.fillStyle = 'rgba(0,0,0,' + trans.toString() + ')';
+	ctx.fillStyle = 'rgba(0,0,0,0.5';
 	ctx.fillRect(0,0,width,height);
 	
 	if(spawnrate.passed()) {
